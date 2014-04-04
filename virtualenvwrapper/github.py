@@ -1,4 +1,6 @@
-import logging, os, subprocess
+import logging
+import os
+import subprocess
 
 log = logging.getLogger(__name__)
 
@@ -9,11 +11,9 @@ def run(*args):
     return p
 
 
-def call(*args):
-    subprocess.call(args, shell=False)
-
-
 def get_url(project):
+    """Return the URL for the given project.
+    """
     p = run('git', 'config', '--global', 'github.user')
     try:
         user = tuple(p.stdout)[0].strip()
@@ -27,11 +27,12 @@ def get_url(project):
 
 
 def template(args):
-    project = args[0]
+    project, project_dir = args
     url = get_url(project)
+    url = get_url(project)
+    outdir = os.path.join(project_dir, project)
     if url:
-        call('git', 'init')
-        call('git', 'remote', 'add', 'origin', url)
-        call('git', 'config', 'branch.master.remote', 'origin')
-        call('git', 'config', 'branch.master.merge', 'refs/heads/master')
-        log.info('Repo setup to track %s' % url)
+        log.info('Cloning %s', url)
+        subprocess.call(['git', 'clone', url, outdir], shell=False)
+    return 
+
